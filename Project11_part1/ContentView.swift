@@ -8,16 +8,31 @@
 import SwiftUI
 
 struct ContentView: View {
-    //Project11_part1 [Accepting multi-line text input with TextEditor]
+    //Project11_part1 [How to combine Core Data and SwiftUI]
     //やっていきやしょう(๑>◡<๑)
-    //TextEditorで複数行のテキスト入力
-    @AppStorage("notes") private var notes = ""
+    //CoreDataファイルを作っていきます
+    
+    @Environment(\.managedObjectContext) var moc
+    @FetchRequest(sortDescriptors: []) var students: FetchedResults<Student>
     
     var body: some View {
-        NavigationView {
-            TextEditor(text: $notes)
-                .navigationTitle("Notes")
-                .padding()
+        VStack {
+            List(students) { student in
+                Text(student.name ?? "Unknown")
+            }
+            Button("Add") {
+                let firstNames = ["Ginny","Harry","Hrmione","Luna"]
+                let lastNames = ["Granger","Lovegood","Potter","Weast"]
+                
+                let chosenFirstName = firstNames.randomElement()!
+                let chosenLastName = lastNames.randomElement()!
+                
+                let student = Student(context: moc)
+                student.id = UUID()
+                student.name = "\(chosenFirstName) \(chosenLastName)"
+                
+                try? moc.save()
+            }
         }
     }
 }
